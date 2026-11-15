@@ -131,6 +131,12 @@ export function createVoidEnvironment(scene: THREE.Scene) {
 
   return {
     update,
+    setVisible(visible: boolean) {
+      lightSphere.visible = visible;
+      glow.visible = visible;
+      pointLight.visible = visible;
+      particles.visible = visible;
+    },
     dispose() {
       scene.remove(lightSphere);
       scene.remove(glow);
