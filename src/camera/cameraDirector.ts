@@ -136,14 +136,14 @@ export class CameraDirector {
       createdAt: new Date().toISOString(),
       samples: this.samples.map(sample => ({
         projectTime: sample.projectTime,
-        position: [sample.position[0], sample.position[1], sample.position[2]],
-        quaternion: [sample.quaternion[0], sample.quaternion[1], sample.quaternion[2], sample.quaternion[3]],
-        target: [sample.target[0], sample.target[1], sample.target[2]],
+        position: [sample.position[0], sample.position[1], sample.position[2]] as [number, number, number],
+        quaternion: [sample.quaternion[0], sample.quaternion[1], sample.quaternion[2], sample.quaternion[3]] as [number, number, number, number],
+        target: [sample.target[0], sample.target[1], sample.target[2]] as [number, number, number],
       })),
       cameraPath: this.samples.map(sample => ({
         time: sample.projectTime,
-        position: [sample.position[0], sample.position[1], sample.position[2]],
-        target: [sample.target[0], sample.target[1], sample.target[2]],
+        position: [sample.position[0], sample.position[1], sample.position[2]] as [number, number, number],
+        target: [sample.target[0], sample.target[1], sample.target[2]] as [number, number, number],
       })),
     };
   }
