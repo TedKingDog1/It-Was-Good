@@ -30,6 +30,8 @@ const fragmentShader = `
   uniform float uTime;
   uniform float uReveal;
   uniform vec3 uCameraPosition;
+  uniform vec3 uPresencePosition;
+  uniform float uPresenceIntensity;
 
   varying vec3 vWorldPosition;
   varying float vWaveHeight;
@@ -47,6 +49,12 @@ const fragmentShader = `
     vec3 color = mix(deepWater, blueWater, 0.30 + crest * 0.42);
     color = mix(color, waveColor, crest * 0.20);
     color += vec3(0.045, 0.075, 0.095) * glint * 0.34;
+
+    float presenceDistance = length(vWorldPosition.xz - uPresencePosition.xz);
+    float reflectionShape = exp(-presenceDistance * 0.075);
+    float reflectionFlicker = 0.62 + 0.38 * sin(vWorldPosition.x * 0.11 + uTime * 1.7);
+    vec3 presenceReflection = vec3(1.0, 0.63, 0.30);
+    color += presenceReflection * reflectionShape * reflectionFlicker * uPresenceIntensity * 0.72;
 
     float distanceToCamera = distance(vWorldPosition, uCameraPosition);
     float atmosphericFade = smoothstep(65.0, 235.0, distanceToCamera);
@@ -76,6 +84,8 @@ export function createPrimordialOcean(scene: THREE.Scene) {
       uTime: { value: 0 },
       uReveal: { value: 0 },
       uCameraPosition: { value: new THREE.Vector3() },
+      uPresencePosition: { value: new THREE.Vector3(0, 2.7, -51) },
+      uPresenceIntensity: { value: 0 },
     },
     vertexShader,
     fragmentShader,
@@ -90,10 +100,18 @@ export function createPrimordialOcean(scene: THREE.Scene) {
   ocean.frustumCulled = false;
   scene.add(ocean);
 
-  function update(elapsedSeconds: number, cameraPosition: THREE.Vector3, reveal: number): void {
+  function update(
+    elapsedSeconds: number,
+    cameraPosition: THREE.Vector3,
+    reveal: number,
+    presencePosition: THREE.Vector3,
+    presenceIntensity: number,
+  ): void {
     material.uniforms.uTime.value = Math.max(0, elapsedSeconds);
     material.uniforms.uReveal.value = THREE.MathUtils.clamp(reveal, 0, 1);
     material.uniforms.uCameraPosition.value.copy(cameraPosition);
+    material.uniforms.uPresencePosition.value.copy(presencePosition);
+    material.uniforms.uPresenceIntensity.value = THREE.MathUtils.clamp(presenceIntensity, 0, 1);
   }
 
   return {
