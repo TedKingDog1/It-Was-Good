@@ -169,11 +169,13 @@ restartSceneButton.addEventListener('click', () => {
 
 cameraModeButton.addEventListener('click', () => {
   if (cameraDirector.isEnabled()) {
+    const take = cameraDirector.stopRecording();
     cameraDirector.disable();
     timeline.pause();
     cameraModeButton.textContent = 'Direct camera';
     recordCameraButton.disabled = true;
     stopCameraButton.disabled = true;
+    saveCameraButton.disabled = take.samples.length < 2;
     cameraStatusMessage.textContent = 'Camera direction off. The authored camera path is active again.';
   } else {
     timeline.pause();
