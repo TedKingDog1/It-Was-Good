@@ -48,6 +48,17 @@
         <section class="visual">
           <h2>Visual Preview</h2>
           <div id="scene"></div>
+          <div class="camera-director">
+            <h3>Camera director</h3>
+            <div class="camera-buttons">
+              <button id="camera-mode" type="button" class="secondary-button">Direct camera</button>
+              <button id="record-camera" type="button" disabled>Record take</button>
+              <button id="stop-camera" type="button" class="secondary-button" disabled>Stop recording</button>
+              <button id="save-camera" type="button" class="secondary-button" disabled>Save camera log</button>
+            </div>
+            <p id="camera-status" aria-live="polite">Enable camera direction to fly through the environment and record a take.</p>
+            <p class="camera-help">WASD: fly · Q/E: down/up · Shift: move faster · Mouse: look · Escape: release mouse</p>
+          </div>
           <p class="scene-caption">Opening sequence: the void. The remaining creation environments will be added to this timeline.</p>
         </section>
       </main>
