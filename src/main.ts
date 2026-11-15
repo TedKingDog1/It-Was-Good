@@ -39,7 +39,7 @@ function formatTime(seconds: number): string {
   return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
-totalTimeDisplay.textContent = formatTime(PROJECT_DURATION_SECONDS);
+totalTime.textContent = formatTime(PROJECT_DURATION_SECONDS);
 
 function updateTimelineControls(time: number): void {
   currentTime.textContent = formatTime(time);
