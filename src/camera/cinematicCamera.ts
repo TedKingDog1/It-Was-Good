@@ -19,11 +19,15 @@ export interface CameraKeyframe {
 export class CinematicCameraRig {
   private readonly position = new THREE.Vector3();
   private readonly target = new THREE.Vector3();
+  private readonly camera: THREE.PerspectiveCamera;
+  private readonly keyframes: readonly CameraKeyframe[];
 
   constructor(
-    private readonly camera: THREE.PerspectiveCamera,
-    private readonly keyframes: readonly CameraKeyframe[],
+    camera: THREE.PerspectiveCamera,
+    keyframes: readonly CameraKeyframe[],
   ) {
+    this.camera = camera;
+    this.keyframes = keyframes;
     if (keyframes.length < 2) {
       throw new Error('A cinematic camera path requires at least two keyframes.');
     }
