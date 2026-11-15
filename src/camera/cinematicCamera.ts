@@ -111,7 +111,7 @@ export class CinematicCameraRig {
     const p2 = new THREE.Vector3(...end);
     const p3 = new THREE.Vector3(...next);
 
-    const tangentStart = segment === 0
+    const tangentStart = previousTime === startTime
       ? new THREE.Vector3().subVectors(p2, p1).divideScalar(duration)
       : new THREE.Vector3().subVectors(p2, p0).divideScalar(endTime - previousTime);
 
