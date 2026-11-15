@@ -2,6 +2,8 @@ import './style.css';
 import * as THREE from 'three';
 import { createVoidEnvironment } from './environments/void';
 import { createPrimordialOcean } from './environments/primordialOcean';
+import { CinematicCameraRig } from './camera/cinematicCamera';
+import { OPENING_CAMERA_PATH } from './camera/openingCameraPath';
 import { MasterTimeline, PROJECT_DURATION_SECONDS } from './masterTimeline';
 
 const container = document.getElementById('scene');
@@ -18,7 +20,6 @@ if (!container || !playPauseButton || !restartButton || !timelineSlider ||
   throw new Error('One or more visualizer controls could not be found in index.html.');
 }
 
-// Preserve non-null references after the runtime checks above.
 const sceneContainer = container;
 const playButton = playPauseButton;
 const restartSceneButton = restartButton;
@@ -44,7 +45,7 @@ totalTime.textContent = formatTime(PROJECT_DURATION_SECONDS);
 function updateTimelineControls(time: number): void {
   currentTime.textContent = formatTime(time);
 
-  if (document.activeElement !== timelineSlider) {
+  if (document.activeElement !== slider) {
     slider.value = String(time);
   }
 
@@ -63,7 +64,7 @@ function updateTimelineControls(time: number): void {
       ? 'Opening sequence: the void. The visual timeline is running.'
       : 'Opening sequence: the void. Press Play visuals to begin.';
   } else if (time <= OCEAN_END_SECONDS) {
-    statusMessage.textContent = 'Prologue: primordial waters. The ocean is gradually emerging from the darkness.';
+    statusMessage.textContent = 'Prologue: primordial waters. The camera is sweeping across the ocean.';
   } else {
     statusMessage.textContent = 'You are beyond the completed opening environments. Later creation scenes are still being built.';
   }
@@ -78,9 +79,8 @@ const camera = new THREE.PerspectiveCamera(
   65,
   Math.max(sceneContainer.clientWidth, 1) / Math.max(sceneContainer.clientHeight, 1),
   0.1,
-  200
+  200,
 );
-camera.position.set(0, 0, 24);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -92,8 +92,8 @@ sceneContainer.appendChild(renderer.domElement);
 
 const voidEnvironment = createVoidEnvironment(scene);
 const oceanEnvironment = createPrimordialOcean(scene);
+const cameraRig = new CinematicCameraRig(camera, OPENING_CAMERA_PATH);
 
-// Keep the opening void visually unchanged until the ocean transition begins.
 scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x000000, 0.006);
 
@@ -101,16 +101,21 @@ function animate(): void {
   requestAnimationFrame(animate);
 
   const time = timeline.getCurrentTime();
+  const openingTime = Math.min(time, OCEAN_END_SECONDS);
 
-  if (time < OCEAN_START_SECONDS) {
+  // One continuous camera path covers the entire opening sequence.
+  cameraRig.update(openingTime);
+
+  if (openingTime < OCEAN_START_SECONDS) {
     voidEnvironment.setVisible(true);
-    voidEnvironment.update(Math.min(time, VOID_END_SECONDS), camera);
+    voidEnvironment.update(openingTime);
+    oceanEnvironment.update(0, camera.position, 0);
   } else {
     voidEnvironment.setVisible(false);
 
-    const oceanTime = time - OCEAN_START_SECONDS;
+    const oceanTime = openingTime - OCEAN_START_SECONDS;
     const reveal = THREE.MathUtils.smoothstep(oceanTime, 0, 8);
-    oceanEnvironment.update(oceanTime, camera, reveal);
+    oceanEnvironment.update(oceanTime, camera.position, reveal);
   }
 
   renderer.render(scene, camera);
@@ -118,8 +123,9 @@ function animate(): void {
 }
 
 timeline.seek(0);
-voidEnvironment.update(0, camera);
-oceanEnvironment.update(0, camera, 0);
+voidEnvironment.update(0);
+oceanEnvironment.update(0, camera.position, 0);
+cameraRig.update(0);
 scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x000000, 0.006);
 renderer.render(scene, camera);
@@ -145,7 +151,7 @@ slider.addEventListener('input', () => {
   updateTimelineControls(timeline.getCurrentTime());
 });
 
-// The iframe load event only confirms that the embedded page loaded.
+// The iframe load event confirms only that the embed loaded.
 // It cannot expose playback position or play/pause state across origins.
 if (player) {
   player.addEventListener('load', () => {
