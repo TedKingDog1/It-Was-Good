@@ -12,6 +12,7 @@ export interface CameraTake {
   version: 1;
   createdAt: string;
   samples: CameraTakeSample[];
+  cameraPath: Array<{ time: number; position: [number, number, number]; target: [number, number, number] }>;
 }
 
 /**
@@ -135,9 +136,14 @@ export class CameraDirector {
       createdAt: new Date().toISOString(),
       samples: this.samples.map(sample => ({
         projectTime: sample.projectTime,
-        position: [...sample.position],
-        quaternion: [...sample.quaternion],
-        target: [...sample.target],
+        position: [sample.position[0], sample.position[1], sample.position[2]],
+        quaternion: [sample.quaternion[0], sample.quaternion[1], sample.quaternion[2], sample.quaternion[3]],
+        target: [sample.target[0], sample.target[1], sample.target[2]],
+      })),
+      cameraPath: this.samples.map(sample => ({
+        time: sample.projectTime,
+        position: [sample.position[0], sample.position[1], sample.position[2]],
+        target: [sample.target[0], sample.target[1], sample.target[2]],
       })),
     };
   }
