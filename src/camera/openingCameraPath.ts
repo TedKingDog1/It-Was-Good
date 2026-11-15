@@ -13,7 +13,7 @@ export const OPENING_CAMERA_PATH: readonly CameraKeyframe[] = [
   { time: 30, position: [0.48, 1.3, -12], target: [0.35, -1.15, -43] },
   { time: 35, position: [-0.8, 0.95, -15.1], target: [-1.2, -1.15, -48] },
   { time: 41, position: [-1.8, 0.8, -18.8], target: [1.8, -1.15, -61] },
-  { time: 46, position: [0.2, 1.05, -21.9], target: [0.4, -1.1, -53] },
-  { time: 51, position: [1.7, 2.0, -25.6], target: [0.7, -0.9, -70] },
-  { time: 55, position: [0.4, 2.8, -30], target: [0, -0.65, -83] },
+  { time: 46, position: [0.2, 1.05, -21.9], target: [-2.8, 2.7, -51] },
+  { time: 51, position: [1.7, 2.0, -25.6], target: [1.5, 2.6, -63.5] },
+  { time: 55, position: [0.4, 2.8, -30], target: [3.4, 2.7, -69] },
 ];
