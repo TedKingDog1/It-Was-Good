@@ -61,7 +61,7 @@ const fragmentShader = `
 
 /**
  * A broad, shader-driven primordial ocean.
- * Its waves are calculated from absolute time, so timeline seeking is deterministic.
+ * Wave motion is calculated from absolute scene time for repeatable seeking.
  */
 export function createPrimordialOcean(scene: THREE.Scene) {
   const previousBackground = scene.background;
@@ -90,37 +90,10 @@ export function createPrimordialOcean(scene: THREE.Scene) {
   ocean.frustumCulled = false;
   scene.add(ocean);
 
-  const cameraTarget = new THREE.Vector3();
-
-  function update(
-    elapsedSeconds: number,
-    camera: THREE.PerspectiveCamera,
-    reveal: number,
-  ): void {
-    const time = Math.max(0, elapsedSeconds);
-    const fade = THREE.MathUtils.clamp(reveal, 0, 1);
-
-    material.uniforms.uTime.value = time;
-    material.uniforms.uReveal.value = fade;
-
-    // Keep the camera close to the water, then gradually lift it toward the horizon.
-    // Start exactly where the void camera finishes at project time 0:30.
-    camera.position.set(
-      Math.sin((time + 30) * 0.045) * 0.5 + Math.sin(time * 0.035) * 0.12,
-      Math.sin((time + 30) * 0.07) * 0.25
-        + THREE.MathUtils.smoothstep(time, 0, 30) * 0.65,
-      -12 - time * 0.62,
-    );
-
-    const cameraTransition = THREE.MathUtils.smoothstep(time, 0, 8);
-    cameraTarget.set(
-      camera.position.x + Math.sin(time * 0.025) * 0.8,
-      THREE.MathUtils.lerp(camera.position.y, -0.95, cameraTransition),
-      camera.position.z - THREE.MathUtils.lerp(10, 42, cameraTransition),
-    );
-    camera.lookAt(cameraTarget);
-
-    material.uniforms.uCameraPosition.value.copy(camera.position);
+  function update(elapsedSeconds: number, cameraPosition: THREE.Vector3, reveal: number): void {
+    material.uniforms.uTime.value = Math.max(0, elapsedSeconds);
+    material.uniforms.uReveal.value = THREE.MathUtils.clamp(reveal, 0, 1);
+    material.uniforms.uCameraPosition.value.copy(cameraPosition);
   }
 
   return {
