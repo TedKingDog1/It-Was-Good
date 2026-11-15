@@ -18,6 +18,15 @@ if (!container || !playPauseButton || !restartButton || !timelineSlider ||
   throw new Error('One or more visualizer controls could not be found in index.html.');
 }
 
+// Preserve non-null references after the runtime checks above.
+const sceneContainer = container;
+const playButton = playPauseButton;
+const restartSceneButton = restartButton;
+const slider = timelineSlider;
+const currentTime = currentTimeDisplay;
+const totalTime = totalTimeDisplay;
+const statusMessage = status;
+
 const timeline = new MasterTimeline();
 const VOID_END_SECONDS = 30;
 const OCEAN_START_SECONDS = 30;
@@ -33,41 +42,41 @@ function formatTime(seconds: number): string {
 totalTimeDisplay.textContent = formatTime(PROJECT_DURATION_SECONDS);
 
 function updateTimelineControls(time: number): void {
-  currentTimeDisplay.textContent = formatTime(time);
+  currentTime.textContent = formatTime(time);
 
   if (document.activeElement !== timelineSlider) {
-    timelineSlider.value = String(time);
+    slider.value = String(time);
   }
 
   if (timeline.isPlaying()) {
-    playPauseButton.textContent = 'Pause';
+    playButton.textContent = 'Pause';
   } else if (time >= PROJECT_DURATION_SECONDS) {
-    playPauseButton.textContent = 'Replay';
+    playButton.textContent = 'Replay';
   } else if (time > 0) {
-    playPauseButton.textContent = 'Resume';
+    playButton.textContent = 'Resume';
   } else {
-    playPauseButton.textContent = 'Play visuals';
+    playButton.textContent = 'Play visuals';
   }
 
   if (time <= VOID_END_SECONDS) {
-    status.textContent = timeline.isPlaying()
+    statusMessage.textContent = timeline.isPlaying()
       ? 'Opening sequence: the void. The visual timeline is running.'
       : 'Opening sequence: the void. Press Play visuals to begin.';
   } else if (time <= OCEAN_END_SECONDS) {
-    status.textContent = 'Prologue: primordial waters. The ocean is gradually emerging from the darkness.';
+    statusMessage.textContent = 'Prologue: primordial waters. The ocean is gradually emerging from the darkness.';
   } else {
-    status.textContent = 'You are beyond the completed opening environments. Later creation scenes are still being built.';
+    statusMessage.textContent = 'You are beyond the completed opening environments. Later creation scenes are still being built.';
   }
 
   if (time >= PROJECT_DURATION_SECONDS && !timeline.isPlaying()) {
-    status.textContent = 'The 7:24 timeline has reached the end. Press Replay or move the slider to review it.';
+    statusMessage.textContent = 'The 7:24 timeline has reached the end. Press Replay or move the slider to review it.';
   }
 }
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   65,
-  Math.max(container.clientWidth, 1) / Math.max(container.clientHeight, 1),
+  Math.max(sceneContainer.clientWidth, 1) / Math.max(sceneContainer.clientHeight, 1),
   0.1,
   200
 );
@@ -75,11 +84,11 @@ camera.position.set(0, 0, 24);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.2;
-container.appendChild(renderer.domElement);
+sceneContainer.appendChild(renderer.domElement);
 
 const voidEnvironment = createVoidEnvironment(scene);
 const oceanEnvironment = createPrimordialOcean(scene);
@@ -117,7 +126,7 @@ renderer.render(scene, camera);
 updateTimelineControls(0);
 animate();
 
-playPauseButton.addEventListener('click', () => {
+playButton.addEventListener('click', () => {
   if (timeline.isPlaying()) {
     timeline.pause();
   } else {
@@ -126,13 +135,13 @@ playPauseButton.addEventListener('click', () => {
   updateTimelineControls(timeline.getCurrentTime());
 });
 
-restartButton.addEventListener('click', () => {
+restartSceneButton.addEventListener('click', () => {
   timeline.restart();
   updateTimelineControls(0);
 });
 
-timelineSlider.addEventListener('input', () => {
-  timeline.seek(Number(timelineSlider.value));
+slider.addEventListener('input', () => {
+  timeline.seek(Number(slider.value));
   updateTimelineControls(timeline.getCurrentTime());
 });
 
@@ -141,14 +150,14 @@ timelineSlider.addEventListener('input', () => {
 if (player) {
   player.addEventListener('load', () => {
     if (!timeline.isPlaying() && timeline.getCurrentTime() === 0) {
-      status.textContent = 'Suno player loaded. Press Play on the soundtrack, then Play visuals.';
+      statusMessage.textContent = 'Suno player loaded. Press Play on the soundtrack, then Play visuals.';
     }
   });
 }
 
 window.addEventListener('resize', () => {
-  const width = container.clientWidth;
-  const height = container.clientHeight;
+  const width = sceneContainer.clientWidth;
+  const height = sceneContainer.clientHeight;
   if (width <= 0 || height <= 0) return;
 
   camera.aspect = width / height;
