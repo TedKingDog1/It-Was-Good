@@ -1,7 +1,7 @@
 import './style.css';
 import * as THREE from 'three';
 import { createVoidEnvironment } from './environments/void';
-import { MasterTimeline, PROJECT_DURATION_SECONDS } from './timeline';
+import { MasterTimeline, PROJECT_DURATION_SECONDS } from './masterTimeline';
 
 const container = document.getElementById('scene');
 const playPauseButton = document.getElementById('play-pause') as HTMLButtonElement | null;
