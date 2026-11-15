@@ -1,40 +1,32 @@
-
 * {
   box-sizing: border-box;
 }
-
 body {
   margin: 0;
   background: #080b12;
   color: #e8eaf0;
   font-family: Arial, sans-serif;
 }
-
 #app {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: auto;
   padding: 40px 24px;
 }
-
 header {
   text-align: center;
   margin-bottom: 40px;
 }
-
 header h1 {
   font-size: 36px;
   margin-bottom: 8px;
 }
-
 header p {
   color: #9ba6bb;
 }
-
 main {
   display: grid;
   gap: 24px;
 }
-
 .player,
 .visual {
   background: #121927;
@@ -42,43 +34,30 @@ main {
   border-radius: 12px;
   padding: 24px;
 }
-
 h2 {
   margin-top: 0;
 }
-
 iframe {
+  display: block;
+  width: 100%;
   border: none;
   border-radius: 8px;
   background: #000;
 }
-
-#status {
-  color: #aab8cc;
-  font-size: 14px;
+.timeline-panel {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid #26344b;
+  border-radius: 10px;
+  background: #0c1320;
 }
-
-#scene {
-  width: 100%;
-  height: 300px;
-  background: #000;
-  border-radius: 8px;
-}
-
-.player-controls {
+.timeline-buttons {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
-
-.player-controls iframe {
-  flex: 1;
-  min-width: 0;
-}
-
-#start-scene {
-  min-width: 140px;
-  height: 54px;
+button {
+  min-height: 44px;
   padding: 0 20px;
   border: 1px solid #d6ad65;
   border-radius: 8px;
@@ -89,24 +68,78 @@ iframe {
   cursor: pointer;
   transition: background 0.2s, transform 0.2s;
 }
-
-#start-scene:hover:not(:disabled) {
+button:hover {
   background: #e0b66c;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
-
-#start-scene:disabled {
-  opacity: 0.5;
-  cursor: default;
+.secondary-button {
+  border-color: #52627a;
+  background: #202c3e;
+  color: #e8eaf0;
 }
-
+.secondary-button:hover {
+  background: #30415a;
+}
+.timeline-readout {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #d8deea;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+#timeline-slider {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: #d6ad65;
+  cursor: pointer;
+}
+#status {
+  margin: 14px 0 5px;
+  color: #e3c58e;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.sync-note,
+.scene-caption {
+  color: #9ba6bb;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sync-note {
+  margin: 0;
+}
+#scene {
+  width: 100%;
+  height: 480px;
+  overflow: hidden;
+  background: #000;
+  border-radius: 8px;
+}
+#scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.scene-caption {
+  margin-bottom: 0;
+}
 @media (max-width: 650px) {
-  .player-controls {
-    flex-direction: column;
-    align-items: stretch;
+  #app {
+    padding: 24px 14px;
   }
-
-  #start-scene {
-    width: 100%;
+  .player,
+  .visual {
+    padding: 16px;
+  }
+  #scene {
+    height: 320px;
+  }
+  .timeline-buttons {
+    flex-wrap: wrap;
+  }
+  .timeline-buttons button {
+    flex: 1;
   }
 }
