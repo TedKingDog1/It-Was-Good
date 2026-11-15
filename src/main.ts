@@ -1,6 +1,7 @@
 import './style.css';
 import * as THREE from 'three';
 import { createVoidEnvironment } from './environments/void';
+import { createPrimordialOcean } from './environments/primordialOcean';
 import { MasterTimeline, PROJECT_DURATION_SECONDS } from './masterTimeline';
 
 const container = document.getElementById('scene');
@@ -18,7 +19,9 @@ if (!container || !playPauseButton || !restartButton || !timelineSlider ||
 }
 
 const timeline = new MasterTimeline();
-const VOID_PREVIEW_DURATION = 30;
+const VOID_END_SECONDS = 30;
+const OCEAN_START_SECONDS = 30;
+const OCEAN_END_SECONDS = 55;
 
 function formatTime(seconds: number): string {
   const safeSeconds = Math.max(0, Math.floor(seconds));
@@ -46,12 +49,14 @@ function updateTimelineControls(time: number): void {
     playPauseButton.textContent = 'Play visuals';
   }
 
-  if (time <= VOID_PREVIEW_DURATION) {
+  if (time <= VOID_END_SECONDS) {
     status.textContent = timeline.isPlaying()
       ? 'Opening sequence: the void. The visual timeline is running.'
       : 'Opening sequence: the void. Press Play visuals to begin.';
+  } else if (time <= OCEAN_END_SECONDS) {
+    status.textContent = 'Prologue: primordial waters. The ocean is gradually emerging from the darkness.';
   } else {
-    status.textContent = 'You are beyond the current void preview. The timeline controls are working; the later creation environments have not been built yet.';
+    status.textContent = 'You are beyond the completed opening environments. Later creation scenes are still being built.';
   }
 
   if (time >= PROJECT_DURATION_SECONDS && !timeline.isPlaying()) {
@@ -77,20 +82,37 @@ renderer.toneMappingExposure = 1.2;
 container.appendChild(renderer.domElement);
 
 const voidEnvironment = createVoidEnvironment(scene);
+const oceanEnvironment = createPrimordialOcean(scene);
+
+// Keep the opening void visually unchanged until the ocean transition begins.
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(0x000000, 0.006);
 
 function animate(): void {
   requestAnimationFrame(animate);
 
-  const currentTime = timeline.getCurrentTime();
-  // The void is the only completed environment so far. Hold its final
-  // frame after 0:30 until the next creation environment is implemented.
-  voidEnvironment.update(Math.min(currentTime, VOID_PREVIEW_DURATION), camera);
+  const time = timeline.getCurrentTime();
+
+  if (time < OCEAN_START_SECONDS) {
+    voidEnvironment.setVisible(true);
+    voidEnvironment.update(Math.min(time, VOID_END_SECONDS), camera);
+  } else {
+    voidEnvironment.setVisible(false);
+
+    const oceanTime = time - OCEAN_START_SECONDS;
+    const reveal = THREE.MathUtils.smoothstep(oceanTime, 0, 8);
+    oceanEnvironment.update(oceanTime, camera, reveal);
+  }
+
   renderer.render(scene, camera);
-  updateTimelineControls(currentTime);
+  updateTimelineControls(time);
 }
 
 timeline.seek(0);
 voidEnvironment.update(0, camera);
+oceanEnvironment.update(0, camera, 0);
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(0x000000, 0.006);
 renderer.render(scene, camera);
 updateTimelineControls(0);
 animate();
