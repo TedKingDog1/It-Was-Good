@@ -112,10 +112,11 @@ export function createPrimordialOcean(scene: THREE.Scene) {
       -12 - time * 0.62,
     );
 
+    const cameraTransition = THREE.MathUtils.smoothstep(time, 0, 8);
     cameraTarget.set(
       camera.position.x + Math.sin(time * 0.025) * 0.8,
-      -0.95,
-      camera.position.z - 42,
+      THREE.MathUtils.lerp(camera.position.y, -0.95, cameraTransition),
+      camera.position.z - THREE.MathUtils.lerp(10, 42, cameraTransition),
     );
     camera.lookAt(cameraTarget);
 
