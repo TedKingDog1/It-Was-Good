@@ -104,10 +104,12 @@ export function createPrimordialOcean(scene: THREE.Scene) {
     material.uniforms.uReveal.value = fade;
 
     // Keep the camera close to the water, then gradually lift it toward the horizon.
+    // Start exactly where the void camera finishes at project time 0:30.
     camera.position.set(
-      Math.sin(time * 0.035) * 0.45,
-      0.35 + THREE.MathUtils.smoothstep(time, 0, 30) * 0.65,
-      -time * 0.62,
+      Math.sin((time + 30) * 0.045) * 0.5 + Math.sin(time * 0.035) * 0.12,
+      Math.sin((time + 30) * 0.07) * 0.25
+        + THREE.MathUtils.smoothstep(time, 0, 30) * 0.65,
+      -12 - time * 0.62,
     );
 
     cameraTarget.set(
